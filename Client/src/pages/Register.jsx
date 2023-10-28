@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { IoFingerPrintOutline } from "react-icons/io5";
+import logo from "../assets/logo.jpeg"
 
 const Register = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
-    const [data, setData] = useState("");
+    // const [data, setData] = useState("");
     const [print, setPrint] = useState(false);
+    const navigate = useNavigate(); // Get the navigate function from React Router
 
     const getPrint = async () => {
         try {
-            const response = await fetch("http://localhost:3000/newReg");
+            const response = await fetch("https://attserver.vercel.app/newReg");
             if (response.ok) {
                 const data = await response.json();
                 setPrint(data[0].newPrint);
@@ -30,7 +32,7 @@ const Register = () => {
     // Function to delete the newPrint data
     const deletePrint = async () => {
         try {
-            const response = await fetch("http://localhost:3000/newReg", {
+            const response = await fetch("https://attserver.vercel.app/newReg", {
                 method: "DELETE",
             });
 
@@ -47,44 +49,41 @@ const Register = () => {
     // Function for post data to the db
     const onSubmit = async (formData) => {
         try {
-            // Include newPrint in formData
-            formData.fingerprint = print;
-            await  deletePrint();
-
-            const response = await fetch("http://localhost:3000/users", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(formData),
-            });
-
-            if (response.ok) {
-                const responseData = await response.json();
-                console.log(responseData);
-
-                if (formData) {
-                    // Show success notification using Swal
-                    window.location.href = "/login";
-                    setData(JSON.stringify(formData));
-                    console.log(JSON.stringify(formData));
-                    console.log(data, "user added successfully");
-
-                } else {
-                    console.error("Failed to save user");
-                }
-            } else {
-                console.error("Failed to save user");
-            }
+          // Include newPrint in formData
+          formData.fingerprint = print;
+          await deletePrint();
+          alert("Registration successful. You can now log in with your new account.");
+          navigate("/login");
+            
+          const response = await fetch("https://attserver.vercel.app/users", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(formData),
+          });
+         
+    
+          if (response.ok) {
+            // Registration was successful
+            alert("Registration successful. You can now log in with your new account.");
+            navigate("/login"); // Navigate to the login page
+          } else {
+            console.error("Failed to save user");
+          }
         } catch (error) {
-            console.error("Error in onSubmit:", error);
+          console.error("Error in onSubmit:", error);
         }
-    };
+      };
+    
+
 
 
     return (
         <div className=" mx-auto flex justify-center items-center h-screen bg-gray-100">
             <div className="md:w-2/6 bg-white rounded-lg shadow-lg p-6 bg-opacity-20">
+                <img src={logo} alt="logo" className="w-30 h-20 mb-10" />
+
                 <h3 className="text-2xl font-semibold mb-4">Please Register</h3>
                 <form className="mx-auto form-control" onSubmit={handleSubmit(onSubmit)}>
                     <input

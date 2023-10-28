@@ -1,31 +1,32 @@
+/* eslint-disable no-unused-vars */
 /* eslint-disable react/no-unescaped-entities */
 import { useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useUser } from "../Provider/UserProvider";
-
+import logo from "../assets/logo.jpeg"
 
 
 const Login = () => {
   const { register, handleSubmit, formState: { errors } } = useForm();
   const { setUser } = useUser();
-const [error, setError] = useState(null);
-  // function to match email password with db and sent to home
+  const [error, setError] = useState(null);
+  const Navigate = useNavigate();
+
   const onSubmit = async (formData) => {
     try {
-      const response = await fetch("http://localhost:3000/authenticate", {
+      const response = await fetch("https://attserver.vercel.app/authenticate", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
-  
+
       if (response.ok) {
         const user = await response.json();
         setUser(user);
-        // Use history to navigate to the home page
-        // window.location.href('/');
+        Navigate("/");
       } else {
         const errorData = await response.json();
         console.error("Authentication failed:", errorData.error);
@@ -38,10 +39,11 @@ const [error, setError] = useState(null);
       setError("An error occurred. Please try again later.");
     }
   };
-  
+
   return (
     <div className=" mx-auto flex justify-center items-center h-screen bg-gray-100">
       <div className="md:w-2/6 bg-white rounded-lg shadow-lg p-6 bg-opacity-20">
+        <img src={logo} alt="logo" className="w-30 h-20 mb-10" />
         <h3 className="text-2xl font-semibold mb-4">Please Login</h3>
         <form className="mx-auto form-control w-[400px]" onSubmit={handleSubmit(onSubmit)}>
           <input

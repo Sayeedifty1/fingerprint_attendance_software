@@ -10,7 +10,7 @@ const UserDetails = () => {
 
     const fetchUserData = async () => {
         try {
-            const response = await fetch("http://localhost:3000/users"); // Replace with your API endpoint
+            const response = await fetch("https://attserver.vercel.app/users");
             if (response.ok) {
                 const userData = await response.json();
                 setUsers(userData);
@@ -21,6 +21,7 @@ const UserDetails = () => {
             console.error("Error:", error);
         }
     };
+    console.log(users)
 
 
     return (

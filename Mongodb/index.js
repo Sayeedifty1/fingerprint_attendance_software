@@ -133,7 +133,7 @@ run().catch(console.dir);
 
 
 app.get('/', (req, res) => {
-    res.send('Robazz server is running')
+    res.send('Att. server is running')
 })
 
 app.listen(port, () => {

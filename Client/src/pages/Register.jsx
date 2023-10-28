@@ -1,18 +1,56 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link } from "react-router-dom";
-
-
+import { IoFingerPrintOutline } from "react-icons/io5";
 
 const Register = () => {
     const { register, handleSubmit, formState: { errors } } = useForm();
     const [data, setData] = useState("");
+    const [print, setPrint] = useState(false);
 
+    const getPrint = async () => {
+        try {
+            const response = await fetch("http://localhost:3000/newReg");
+            if (response.ok) {
+                const data = await response.json();
+                setPrint(data[0].newPrint);
+            } else {
+                console.error("Failed to fetch user data");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    };
 
+    useEffect(() => {
+        getPrint();
+    }, []);
+    console.log(print)
 
-    // function for post data to the db
+    // Function to delete the newPrint data
+    const deletePrint = async () => {
+        try {
+            const response = await fetch("http://localhost:3000/newReg", {
+                method: "DELETE",
+            });
+
+            if (response.ok) {
+                setPrint(false); // Update the print state to indicate deletion
+            } else {
+                console.error("Failed to delete newPrint data");
+            }
+        } catch (error) {
+            console.error("Error in deletePrint:", error);
+        }
+    };
+
+    // Function for post data to the db
     const onSubmit = async (formData) => {
         try {
+            // Include newPrint in formData
+            formData.fingerprint = print;
+            await  deletePrint();
+
             const response = await fetch("http://localhost:3000/users", {
                 method: "POST",
                 headers: {
@@ -24,13 +62,14 @@ const Register = () => {
             if (response.ok) {
                 const responseData = await response.json();
                 console.log(responseData);
+
                 if (formData) {
                     // Show success notification using Swal
                     window.location.href = "/login";
                     setData(JSON.stringify(formData));
-                    console.log(JSON.stringify(formData))
-                    // userState(data)
+                    console.log(JSON.stringify(formData));
                     console.log(data, "user added successfully");
+
                 } else {
                     console.error("Failed to save user");
                 }
@@ -38,9 +77,10 @@ const Register = () => {
                 console.error("Failed to save user");
             }
         } catch (error) {
-            console.error("Error:", error);
+            console.error("Error in onSubmit:", error);
         }
     };
+
 
     return (
         <div className=" mx-auto flex justify-center items-center h-screen bg-gray-100">
@@ -72,7 +112,6 @@ const Register = () => {
                     </select>
                     {errors.category && <p className="text-red-500">Category is required</p>}
 
-
                     <input
                         type="password"
                         {...register("password", {
@@ -88,6 +127,9 @@ const Register = () => {
                         </p>
                     )}
 
+                    <IoFingerPrintOutline className={`text-6xl ${print ? 'text-green-600' : 'text-red-600'}`} />
+
+
                     <input
                         className="p-2 bg-blue-600 text-white rounded-lg mt-4"
                         value="Register"
@@ -102,11 +144,9 @@ const Register = () => {
                 </form>
 
                 <Link className="text-red-400" to="/">Go Back to home</Link>
-
             </div>
         </div>
     );
-}
-
+};
 
 export default Register;

@@ -3,14 +3,25 @@ import { useEffect, useState } from "react";
 const UserDetails = () => {
     const [users, setUsers] = useState([]);
 
-    // Fetch users from your backend API or database
     useEffect(() => {
-        // Replace this URL with the endpoint that fetches your user data
-        fetch("http://localhost:3000/users")
-            .then((response) => response.json())
-            .then((data) => setUsers(data))
-            .catch((error) => console.error("Error fetching users:", error));
-    }, []);
+        // Fetch user data from your backend API or database when the component mounts
+        fetchUserData();
+    }, []); // The empty dependency array ensures the effect runs once after initial render
+
+    const fetchUserData = async () => {
+        try {
+            const response = await fetch("http://localhost:3000/users"); // Replace with your API endpoint
+            if (response.ok) {
+                const userData = await response.json();
+                setUsers(userData);
+            } else {
+                console.error("Failed to fetch user data");
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    };
+
 
     return (
         <div className="text-center">
@@ -22,7 +33,6 @@ const UserDetails = () => {
                             <th>Name</th>
                             <th>Email</th>
                             <th>Category</th>
-                            <th>Created At</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -31,7 +41,6 @@ const UserDetails = () => {
                                 <td>{user.name}</td>
                                 <td>{user.email}</td>
                                 <td>{user.category}</td>
-                                <td>{user.created_at}</td>
                             </tr>
                         ))}
                     </tbody>

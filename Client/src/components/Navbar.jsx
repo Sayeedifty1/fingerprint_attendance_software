@@ -29,7 +29,6 @@ const Navbar = () => {
                                 ) : (
                                     <Link to="/dashboard">Dashboard</Link>
                                 )}
-                                <Link>Update Info</Link>
                                 <Link onClick={signOut}>Logout</Link>
                             </li>
                         ) : (

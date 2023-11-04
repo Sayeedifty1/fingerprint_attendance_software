@@ -39,11 +39,22 @@ async function run() {
         const usersCollection = client.db("premier").collection("Users");
         const newPrintCollection = client.db("premier").collection("newReg");
 
+        // post string data in newPrintCollection only a string named newPrint
+        app.post('/newReg', (req, res) => {
+            const newPrint = req.body;
+            newPrintCollection.insertOne(newPrint)
+                .then(result => {
+                    res.send(result.insertedCount > 0)
+                })
+        })
+            
+
         // get data from newReg collection
         app.get('/newReg', async (req, res) => {
             const result = await newPrintCollection.find().toArray();
             res.send(result);
         });
+
 
         // delete data from newReg collection
         app.delete("/newReg", async (req, res) => {

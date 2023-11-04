@@ -44,6 +44,7 @@ const TeacherDash = () => {
                         ))}
                         <th className="p-4 border border-gray-400">Total Days Present</th>
                         <th className="p-4 border border-gray-400">Percentage</th>
+                        <th className="p-4 border border-gray-400">Total Marks</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -59,6 +60,9 @@ const TeacherDash = () => {
                             <td className="p-4 border border-gray-400">{item.totalPresent}</td>
                             <td className="p-4 border border-gray-400">
                                 {((item.totalPresent / 26) * 100).toFixed(2)}%
+                            </td>
+                            <td className="p-4 border border-gray-400">
+                                {((item.totalPresent / 26) * 10).toFixed(2)}
                             </td>
                         </tr>
                     ))}

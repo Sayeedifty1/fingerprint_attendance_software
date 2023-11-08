@@ -82,27 +82,6 @@ async function run() {
             }
         });
 
-
-
-
-        // app.post('/users', (req, res) => {
-        //     const { name, email, category, password, fingerprint, courses } = req.body;
-
-        //     if (!name || !email || !category || !password || !courses) {
-        //         return res.status(400).json({ error: 'All fields are required' });
-        //     }
-
-        //     const user = { name, email, category, password, fingerprint };
-
-        //     usersCollection.insertOne(user, (err, result) => {
-        //         if (err) {
-        //             console.error('Error inserting user into MongoDB:', err);
-        //             return res.status(500).json({ error: 'Failed to register user' });
-        //         }
-        //         console.log('User registered successfully');
-        //         res.status(200).json({ message: 'User registered successfully' });
-        //     });
-        // });
         app.post('/users', async (req, res) => {
             const { name, email, category, password, fingerprint, courses, mobile, id } = req.body;
 
@@ -145,6 +124,28 @@ async function run() {
                 res.status(500).send("Failed to delete user");
             }
         });
+        // edit user info by id , email, mobile, name
+        app.post("/users/:id", async (req, res) => {
+            try {
+                const id = new ObjectId(req.params.id);
+                const { name, email, mobile } = req.body;
+                const result = await usersCollection.updateOne(
+                    { _id: id },
+                    { $set: { name, email, mobile } }
+                );
+
+                if (result.modifiedCount > 0) {
+                    res.send(true);
+                } else {
+                    res.send(false);
+                }
+            } catch (error) {
+                console.error("Error updating user:", error);
+                res.status(500).send("Failed to update user");
+            }
+        });
+
+
 
 
 

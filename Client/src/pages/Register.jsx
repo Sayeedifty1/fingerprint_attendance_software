@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { IoFingerPrintOutline } from "react-icons/io5";
 import logo from "../assets/logo.jpeg"
 
 const Register = () => {
-    const { register, handleSubmit, formState: { errors } } = useForm();
+    const { register, handleSubmit, reset, formState: { errors } } = useForm();
     // const [data, setData] = useState("");
-    const [print, setPrint] = useState(false);
-    const navigate = useNavigate(); // Get the navigate function from React Router
+    const [selectedCategory, setSelectedCategory] = useState("");
 
+    const [print, setPrint] = useState(false);
+    const [selectedCourses, setSelectedCourses] = useState([]); // Track selected courses
     const getPrint = async () => {
         try {
             const response = await fetch("https://attserver.vercel.app/newReg");
@@ -26,9 +27,12 @@ const Register = () => {
 
     useEffect(() => {
         getPrint();
-    }, []);
+    }, [1000]);
     console.log(print)
 
+    const handleCategoryChange = (e) => {
+        setSelectedCategory(e.target.value);
+    };
     // Function to delete the newPrint data
     const deletePrint = async () => {
         try {
@@ -47,35 +51,51 @@ const Register = () => {
     };
 
     // Function for post data to the db
+    const handleCourseChange = (course, isChecked) => {
+        setSelectedCourses((prevCourses) => {
+            const updatedCourses = { ...prevCourses };
+            if (isChecked) {
+                updatedCourses[course] = course;
+            } else {
+                delete updatedCourses[course];
+            }
+            return updatedCourses;
+        });
+    };
+
+
     const onSubmit = async (formData) => {
         try {
-          // Include newPrint in formData
-          formData.fingerprint = print;
-          await deletePrint();
-          alert("Registration successful. You can now log in with your new account.");
-          navigate("/login");
-            
-          const response = await fetch("https://attserver.vercel.app/users", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(formData),
-          });
-         
-    
-          if (response.ok) {
-            // Registration was successful
+            // Include newPrint and formatted courses in formData
+            formData.fingerprint = print;
+            if (selectedCategory === "Student") {
+                formData.courses = "Student";
+            } else {
+                formData.courses = Object.values(selectedCourses).join(", ");
+            }
+
+            console.log(formData);
             alert("Registration successful. You can now log in with your new account.");
-            navigate("/login"); // Navigate to the login page
-          } else {
-            console.error("Failed to save user");
-          }
+            reset(); // Reset the form
+            deletePrint(); // Delete the newPrint data
+
+            const response = await fetch("http://localhost:3000/users", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(formData),
+            });
+
+            if (response.ok) {
+                alert("Registration successful. You can now log in with your new account.");
+            } else {
+                console.error("Failed to save user");
+            }
         } catch (error) {
-          console.error("Error in onSubmit:", error);
+            console.error("Error in onSubmit:", error);
         }
-      };
-    
+    };
 
 
 
@@ -102,15 +122,32 @@ const Register = () => {
 
                     <select
                         className={`border border-black p-1 rounded mb-4 ${errors.category ? 'border-red-500' : ''}`}
-                        {...register("category", { required: true })}
+                        {...register("category", { required: true })} onChange={handleCategoryChange} 
                     >
                         <option value="">Select Category...</option>
                         <option value="Student">Student</option>
                         <option value="Teacher">Teacher</option>
-                        <option value="Admin">Admin</option>
                     </select>
                     {errors.category && <p className="text-red-500">Category is required</p>}
-
+                    {
+                        selectedCategory === "Teacher" && (
+                            <>
+                                <p>Select Courses:</p>
+                                {["VLSI", "TDEP", "IPE", "DLD"].map((course) => (
+                                    <label key={course}>
+                                        <input
+                                            type="checkbox"
+                                            {...register(`courses[${course}]`)}
+                                            value={course}
+                                            onChange={(e) => handleCourseChange(course, e.target.checked)}
+                                        />
+                                        {course}
+                                    </label>
+                                )
+                                )}
+                            </>
+                        )
+                    }
                     <input
                         type="password"
                         {...register("password", {
@@ -134,12 +171,7 @@ const Register = () => {
                         value="Register"
                         type="submit"
                     />
-                    <p className="mt-2">
-                        Already have an account?{' '}
-                        <a className="text-blue-700" href="/login">
-                            Login
-                        </a>
-                    </p>
+                    
                 </form>
 
                 <Link className="text-red-400" to="/">Go Back to home</Link>

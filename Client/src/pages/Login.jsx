@@ -73,7 +73,7 @@ const Login = () => {
             value="Log In"
             type="submit"
           />
-          <p>Don't have an account? <a className="text-blue-600" href="/register">Register</a></p>
+        
         </form>
 
         <Link className="text-red-400" to="/">Go Back to home</Link>

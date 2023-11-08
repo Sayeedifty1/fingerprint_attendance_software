@@ -40,14 +40,24 @@ async function run() {
         const newPrintCollection = client.db("premier").collection("newReg");
 
         // post string data in newPrintCollection only a string named newPrint
-        app.post('/newReg', (req, res) => {
+        app.post('/newReg', async (req, res) => {
+
             const newPrint = req.body;
-            newPrintCollection.insertOne(newPrint)
-                .then(result => {
-                    res.send(result.insertedCount > 0)
-                })
-        })
-            
+
+            // Insert the data into the newPrintCollection
+            const result = await newPrintCollection.insertOne(newPrint);
+
+            if (result.insertedCount > 0) {
+                // Data was inserted successfully
+                res.send('Fingerprint insertion failed');
+            } else {
+                // Fingerprint insertion failed
+
+                res.send('Fingerprint inserted successfully');
+            }
+
+        });
+
 
         // get data from newReg collection
         app.get('/newReg', async (req, res) => {
@@ -75,24 +85,51 @@ async function run() {
 
 
 
-        app.post('/users', (req, res) => {
-            const { name, email, category, password, fingerprint } = req.body;
+        // app.post('/users', (req, res) => {
+        //     const { name, email, category, password, fingerprint, courses } = req.body;
 
-            if (!name || !email || !category || !password) {
-                return res.status(400).json({ error: 'All fields are required' });
+        //     if (!name || !email || !category || !password || !courses) {
+        //         return res.status(400).json({ error: 'All fields are required' });
+        //     }
+
+        //     const user = { name, email, category, password, fingerprint };
+
+        //     usersCollection.insertOne(user, (err, result) => {
+        //         if (err) {
+        //             console.error('Error inserting user into MongoDB:', err);
+        //             return res.status(500).json({ error: 'Failed to register user' });
+        //         }
+        //         console.log('User registered successfully');
+        //         res.status(200).json({ message: 'User registered successfully' });
+        //     });
+        // });
+        app.post('/users', async (req, res) => {
+            const { name, email, category, password, fingerprint, courses } = req.body;
+
+            console.log('Received request data:', req.body);
+
+            if (!name || !email || !category || !password || !courses) {
+                return res.status(400).json({ error: 'All fields are required, including courses' });
             }
 
-            const user = { name, email, category, password, fingerprint };
+            const user = { name, email, category, password, fingerprint, courses };
 
-            usersCollection.insertOne(user, (err, result) => {
-                if (err) {
-                    console.error('Error inserting user into MongoDB:', err);
-                    return res.status(500).json({ error: 'Failed to register user' });
+            try {
+                const result = await usersCollection.insertOne(user);
+
+                if (result.insertedCount > 0) {
+                    console.log('User registered successfully');
+                    res.status(200).json({ message: 'User registered successfully' });
+                } else {
+                    res.status(500).json({ error: 'Failed to register user' });
                 }
-                console.log('User registered successfully');
-                res.status(200).json({ message: 'User registered successfully' });
-            });
+            } catch (err) {
+                console.error('Error inserting user into MongoDB:', err);
+                res.status(500).json({ error: 'Failed to register user' });
+            }
         });
+
+
 
         app.post('/authenticate', async (req, res) => {
             try {

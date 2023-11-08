@@ -104,15 +104,15 @@ async function run() {
         //     });
         // });
         app.post('/users', async (req, res) => {
-            const { name, email, category, password, fingerprint, courses } = req.body;
+            const { name, email, category, password, fingerprint, courses, mobile, id } = req.body;
 
             console.log('Received request data:', req.body);
 
-            if (!name || !email || !category || !password || !courses) {
+            if (!name || !email || !category || !password || !courses || !mobile || !id) {
                 return res.status(400).json({ error: 'All fields are required, including courses' });
             }
 
-            const user = { name, email, category, password, fingerprint, courses };
+            const user = { name, email, category, password, fingerprint, courses, mobile, id };
 
             try {
                 const result = await usersCollection.insertOne(user);
@@ -126,6 +126,23 @@ async function run() {
             } catch (err) {
                 console.error('Error inserting user into MongoDB:', err);
                 res.status(500).json({ error: 'Failed to register user' });
+            }
+        });
+
+        // delete a user from database by id
+        app.delete("/users/:id", async (req, res) => {
+            try {
+                const id = new ObjectId(req.params.id);
+                const result = await usersCollection.deleteOne({ _id: id });
+
+                if (result.deletedCount > 0) {
+                    res.send(true);
+                } else {
+                    res.send(false);
+                }
+            } catch (error) {
+                console.error("Error deleting user:", error);
+                res.status(500).send("Failed to delete user");
             }
         });
 

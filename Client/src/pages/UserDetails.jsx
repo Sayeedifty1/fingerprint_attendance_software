@@ -21,7 +21,25 @@ const UserDetails = () => {
             console.error("Error:", error);
         }
     };
-    console.log(users)
+
+    // delete a user by id
+    const deleteUser = async (id) => {
+        try {
+            const response = await fetch(`http://localhost:3000/users/${id}`, {
+                method: "DELETE",
+            });
+            if (response.ok) {
+                console.log("User deleted successfully");
+                alert("User deleted successfully");
+                fetchUserData(); // Refresh the user data after deletion
+            } else {
+                console.error("Failed to delete user");
+                console.error(await response.text()); // Log any error message from the server
+            }
+        } catch (error) {
+            console.error("Error:", error);
+        }
+    };
 
 
     return (
@@ -34,14 +52,21 @@ const UserDetails = () => {
                             <th>Name</th>
                             <th>Email</th>
                             <th>Category</th>
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
                         {users.map((user) => (
-                            <tr key={user.id}>
+                            <tr key={user._id}>
                                 <td>{user.name}</td>
                                 <td>{user.email}</td>
                                 <td>{user.category}</td>
+                                <td className="flex text-center">
+                                    <div>
+                                        <button className="p-1 bg-blue-600 rounded-lg text-white mx-6">Edit</button>
+                                        <button onClick={() => deleteUser(user._id)} className="p-1 bg-red-600 rounded-lg text-white">Delete</button>
+                                    </div>
+                                </td>
                             </tr>
                         ))}
                     </tbody>

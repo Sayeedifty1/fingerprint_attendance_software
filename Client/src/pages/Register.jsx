@@ -28,7 +28,7 @@ const Register = () => {
     useEffect(() => {
         getPrint();
     }, [1000]);
-    console.log(print)
+
 
     const handleCategoryChange = (e) => {
         setSelectedCategory(e.target.value);
@@ -66,31 +66,34 @@ const Register = () => {
 
     const onSubmit = async (formData) => {
         try {
-            // Include newPrint and formatted courses in formData
-            formData.fingerprint = print;
-            if (selectedCategory === "Student") {
-                formData.courses = "Student";
-            } else {
-                formData.courses = Object.values(selectedCourses).join(", ");
-            }
+            // Check if the form is valid
+            if (Object.keys(errors).length === 0) {
+                // Include newPrint and formatted courses in formData
+                formData.fingerprint = print;
+                if (selectedCategory === "Student") {
+                    formData.courses = [];
+                } else {
+                    formData.courses = Object.keys(selectedCourses);
+                }
 
-            console.log(formData);
-            alert("Registration successful. You can now log in with your new account.");
-            reset(); // Reset the form
-            deletePrint(); // Delete the newPrint data
-
-            const response = await fetch("http://localhost:3000/users", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify(formData),
-            });
-
-            if (response.ok) {
+                console.log(formData);
                 alert("Registration successful. You can now log in with your new account.");
-            } else {
-                console.error("Failed to save user");
+                reset(); // Reset the form
+                deletePrint(); // Delete the newPrint data
+
+                const response = await fetch("http://localhost:3000/users", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(formData),
+                });
+
+                if (response.ok) {
+                    alert("Registration successful. You can now log in with your new account.");
+                } else {
+                    console.error("Failed to save user");
+                }
             }
         } catch (error) {
             console.error("Error in onSubmit:", error);
@@ -119,10 +122,22 @@ const Register = () => {
                         className={`border border-black p-1 rounded mb-4 ${errors.email ? 'border-red-500' : ''}`}
                     />
                     {errors.email && <p className="text-red-500">Valid email is required</p>}
+                    <input
+                        {...register("mobile", { required: true })}
+                        placeholder="Enter Mobile Number"
+                        className={`border border-black p-1 rounded mb-4 ${errors.email ? 'border-red-500' : ''}`}
+                    />
+                    {errors.mobile && <p className="text-red-500">Mobile Number is required</p>}
+                    <input
+                        {...register("id", { required: true })}
+                        placeholder="Enter ID"
+                        className={`border border-black p-1 rounded mb-4 ${errors.email ? 'border-red-500' : ''}`}
+                    />
+                    {errors.id && <p className="text-red-500">ID is required</p>}
 
                     <select
                         className={`border border-black p-1 rounded mb-4 ${errors.category ? 'border-red-500' : ''}`}
-                        {...register("category", { required: true })} onChange={handleCategoryChange} 
+                        {...register("category", { required: true })} onChange={handleCategoryChange}
                     >
                         <option value="">Select Category...</option>
                         <option value="Student">Student</option>
@@ -171,7 +186,7 @@ const Register = () => {
                         value="Register"
                         type="submit"
                     />
-                    
+
                 </form>
 
                 <Link className="text-red-400" to="/">Go Back to home</Link>

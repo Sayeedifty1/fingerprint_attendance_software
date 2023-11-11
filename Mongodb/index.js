@@ -65,6 +65,36 @@ async function run() {
             res.send(result);
         });
 
+        
+        // Get the next serial number from the userCollection
+        app.get('/next-serial', async (req, res) => {
+            try {
+                const result = await usersCollection.find({}, { projection: { fingerprint: 1 }, sort: { fingerprint: 1 } }).toArray();
+
+                if (result.length === 0) {
+                    // If no data exists, start with serial number 1
+                    res.json({ nextSerial: 1 });
+                } else {
+                    // Find the first available serial number
+                    let nextSerial = 1;
+                    for (const user of result) {
+                        const serial = parseInt(user.fingerprint, 10);
+                        if (!isNaN(serial) && serial === nextSerial) {
+                            nextSerial++;
+                        } else {
+                            break; // Stop when a gap is found
+                        }
+                    }
+
+                    res.json({ nextSerial });
+                }
+            } catch (error) {
+                console.error('Error retrieving next serial:', error);
+                res.status(500).json({ error: 'Failed to retrieve next serial' });
+            }
+        });
+
+
 
         // delete data from newReg collection
         app.delete("/newReg", async (req, res) => {
@@ -185,6 +215,36 @@ async function run() {
             const result = await usersCollection.find().toArray();
             res.send(result);
         });
+
+        // get details by fingerprint
+        app.post("/search-user", async (req, res) => {
+            try {
+                const { fingerprint } = req.body;
+
+                // Search for a user with a matching fingerprint in the userCollection
+                const user = await usersCollection.findOne({ fingerprint: fingerprint });
+
+                if (user) {
+                    const responseData = {
+                        name: user.name,
+                        category: user.category,
+                        id: user.id,
+                    };
+
+                    if (user.category === "Teacher") {
+                        responseData.courses = user.courses; // If the user is a teacher, add courses
+                    }
+
+                    res.json(responseData);
+                } else {
+                    res.status(404).json({ message: "User not found" });
+                }
+            } catch (error) {
+                console.error("Error searching for user by fingerprint:", error);
+                res.status(500).json({ message: "Fingerprint search failed" });
+            }
+        });
+
 
         // Send a ping to confirm a successful connection
         await client.db("admin").command({ ping: 1 });

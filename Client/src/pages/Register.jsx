@@ -146,10 +146,10 @@ const Register = () => {
                     {errors.category && <p className="text-red-500">Category is required</p>}
                     {
                         selectedCategory === "Teacher" && (
-                            <>
+                            <div className="flex gap-4">
                                 <p>Select Courses:</p>
-                                {["VLSI", "TDEP", "IPE", "DLD"].map((course) => (
-                                    <label key={course}>
+                                {["MM", "PPE", "RE", "DSP"].map((course) => (
+                                    <label key={course} >
                                         <input
                                             type="checkbox"
                                             {...register(`courses[${course}]`)}
@@ -160,7 +160,7 @@ const Register = () => {
                                     </label>
                                 )
                                 )}
-                            </>
+                            </div>
                         )
                     }
                     <input

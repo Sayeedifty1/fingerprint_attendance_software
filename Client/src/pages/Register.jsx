@@ -81,7 +81,7 @@ const Register = () => {
                 reset(); // Reset the form
                 deletePrint(); // Delete the newPrint data
 
-                const response = await fetch("http://localhost:3000/users", {
+                const response = await fetch("http://localhost:5000/users", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -148,7 +148,7 @@ const Register = () => {
                         selectedCategory === "Teacher" && (
                             <div className="flex gap-4">
                                 <p>Select Courses:</p>
-                                {["MM", "PPE", "RE", "DSP"].map((course) => (
+                                {["MAE", "CMSC", "DSP", "MM"].map((course) => (
                                     <label key={course} >
                                         <input
                                             type="checkbox"

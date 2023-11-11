@@ -3,11 +3,12 @@ const cors = require('cors');
 const app = express();
 require('dotenv').config();
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 
 // ! Middleware
 app.use(cors());
 app.use(express.json());
+
 
 
 
@@ -38,6 +39,7 @@ async function run() {
         }));
         const usersCollection = client.db("premier").collection("Users");
         const newPrintCollection = client.db("premier").collection("newReg");
+        const attCollection = client.db("premier").collection("attendance");
 
         // post string data in newPrintCollection only a string named newPrint
         app.post('/newReg', async (req, res) => {
@@ -65,7 +67,7 @@ async function run() {
             res.send(result);
         });
 
-        
+
         // Get the next serial number from the userCollection
         app.get('/next-serial', async (req, res) => {
             try {
@@ -137,6 +139,26 @@ async function run() {
                 res.status(500).json({ error: 'Failed to register user' });
             }
         });
+
+        // Post attencenceData in attCollection
+        app.post('/attendance', async (req, res) => {
+            const attendanceData = req.body;
+            console.log(attendanceData);
+
+            try {
+                const result = await attCollection.insertOne(attendanceData);
+                if (result.acknowledged) {
+                    res.status(201).json({ message: 'Attendance data successfully posted' });
+                } else {
+                    throw new Error('Insert operation failed');
+                }
+            } catch (err) {
+                console.error('Error inserting attendance data into MongoDB:', err);
+                res.status(500).json({ error: 'Failed to post attendance data' });
+            }
+        });
+
+        
 
         // delete a user from database by id
         app.delete("/users/:id", async (req, res) => {

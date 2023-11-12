@@ -81,7 +81,7 @@ const Register = () => {
                 reset(); // Reset the form
                 deletePrint(); // Delete the newPrint data
 
-                const response = await fetch("http://localhost:5000/users", {
+                const response = await fetch("https://attserver.vercel.app/users", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -103,7 +103,7 @@ const Register = () => {
 
 
     return (
-        <div className=" mx-auto flex justify-center items-center h-screen bg-gray-100">
+        <div className=" mx-auto flex justify-center pt-10 h-screen bg-gray-100">
             <div className="md:w-2/6 bg-white rounded-lg shadow-lg p-6 bg-opacity-20">
                 <img src={logo} alt="logo" className="w-30 h-20 mb-10" />
 

@@ -1,73 +1,91 @@
-const TeacherDash = () => {
-    const data = [
-        {
-            id: 1,
-            name: "John Doe",
-            attendance: [
-                true, false, true, true, false, true, true, true, true, false, true, true, true, false, true, true, false, true, true, true, true, false, true, true, true, false
-            ],
-            totalPresent: 18,
-        },
-        {
-            id: 2,
-            name: "Jane Smith",
-            attendance: [
-                true, true, false, true, true, true, false, true, true, true, false, true, true, true, true, true, true, true, false, true, true, true, false, true, true, false
-            ],
-            totalPresent: 21,
-        },
-        {
-            id: 3,
-            name: "Alice Johnson",
-            attendance: [
-                true, true, false, true, true, true, false, true, true, true, false, true, true, true, true, true, true, true, false, true, true, true, false, true, true, false
-            ],
-            totalPresent: 21,
-        },
-    ];
+import { useEffect, useState } from "react";
+import { useUser } from "../Provider/UserProvider";
 
-    const formatAttendance = (isPresent) => (isPresent ? 'P' : 'A');
+const TeacherDash = () => {
+    const { user } = useUser();
+    const teacherId = user?.fingerprint;
+    const courseName = "VLSI"; // You can dynamically set this value based on your logic
+
+    const [studentsData, setStudentsData] = useState([]);
+    const [attendanceData, setAttendanceData] = useState({ matchedData: [], uniqueCourses: [] });
+
+    useEffect(() => {
+        const fetchAttendanceData = async () => {
+            try {
+                const response = await fetch(`http://localhost:5000/attendance/${courseName}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch attendance data');
+                }
+
+                const data = await response.json();
+                setAttendanceData(data);
+            } catch (error) {
+                console.error('Error fetching attendance data:', error);
+            }
+        };
+
+        const fetchStudentsData = async () => {
+            try {
+                const response = await fetch('http://localhost:5000/users');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch student data');
+                }
+
+                const data = await response.json();
+                // Filter only students
+                const students = data.filter(student => student.category === 'Student');
+                setStudentsData(students);
+            } catch (error) {
+                console.error('Error fetching student data:', error);
+            }
+        };
+
+        if (teacherId) {
+            fetchAttendanceData();
+            fetchStudentsData();
+        }
+    }, [teacherId, courseName]);
 
     return (
         <div className="w-[80%] mx-auto overflow-x-auto">
             <h1 className="text-5xl my-10">Attendance </h1>
-            <p>Name: Teacher Name</p>
-            <table className="w-4/5 border border-collapse border-gray-400">
-                <thead>
-                    <tr>
-                        <th className="p-4 border border-gray-400">Name</th>
-                        <th className="p-4 border border-gray-400">ID</th>
-                        {Array.from({ length: 26 }, (_, index) => (
-                            <th key={index} className="p-4 border border-gray-400">
-                                Day {index + 1}
-                            </th>
-                        ))}
-                        <th className="p-4 border border-gray-400">Total Days Present</th>
-                        <th className="p-4 border border-gray-400">Percentage</th>
-                        <th className="p-4 border border-gray-400">Total Marks</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {data.map((item) => (
-                        <tr key={item.id}>
-                            <td className="p-4 border border-gray-400">{item.name}</td>
-                            <td className="p-4 border border-gray-400">{item.id}</td>
-                            {item.attendance.map((isPresent, index) => (
-                                <td key={index} className="p-4 border border-gray-400">
-                                    {formatAttendance(isPresent)}
-                                </td>
+            <p>Name: {user?.name}</p>
+            <p>Taken Course: {user?.courses.length}</p>
+
+            {/* Iterate over each course */}
+            {attendanceData.uniqueCourses.map((course, index) => (
+                <table key={index} className="w-4/5 border border-collapse border-gray-400">
+                    <caption>Attendance for {course} course</caption>
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Id</th>
+                            {/* Iterate over the unique dates in the attendance data for the current course */}
+                            {attendanceData.matchedData.map(data => (
+                                <th key={data.Date}>{data.Date}</th>
                             ))}
-                            <td className="p-4 border border-gray-400">{item.totalPresent}</td>
-                            <td className="p-4 border border-gray-400">
-                                {((item.totalPresent / 26) * 100).toFixed(2)}%
-                            </td>
-                            <td className="p-4 border border-gray-400">
-                                {((item.totalPresent / 26) * 10).toFixed(2)}
-                            </td>
+                            <th>Total Present Days</th>
+                            <th>Percentage</th>
+                            <th>Total marks</th>
                         </tr>
-                    ))}
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        {studentsData?.map(student => (
+                            <tr key={student?.id}>
+                                <td>{student?.name}</td>
+                                <td>{student?.id}</td>
+                                {/* Iterate over the unique dates in the attendance data for the current course */}
+                                {Array.from(new Set(attendanceData.matchedData.filter(data => data.course === course).map(data => data.Date))).map(date => (
+                                    <td key={date}>
+                                        {attendanceData.matchedData.find(data => data.Date === date && Object.values(data).includes(student.fingerprint)) ? 'P' : 'A'}
+                                    </td>
+                                ))}
+                                {/* Add more table cells with total present days, percentage, and total marks */}
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            ))}
         </div>
     );
 };

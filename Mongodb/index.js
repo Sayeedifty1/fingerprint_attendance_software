@@ -158,8 +158,29 @@ async function run() {
             }
         });
 
+        // get all attendance data from attCollection
+        app.get('/attendance/:course', async (req, res) => {
+            const courseName = req.params.course;
         
-
+            try {
+                // Search for attendance data based on the course name
+                const attendanceData = await attCollection.find({ course: courseName }).toArray();
+        
+                if (attendanceData.length === 0) {
+                    return res.status(404).json({ error: 'Attendance data not found for the specified course' });
+                }
+        
+                // Extract unique course names
+                const uniqueCourses = [...new Set(attendanceData.map(data => data.course))];
+        
+                // Send the unique course names along with the matched attendance data
+                res.status(200).json({ matchedData: attendanceData, uniqueCourses });
+            } catch (error) {
+                console.error('Error retrieving attendance data:', error);
+                res.status(500).json({ error: 'Failed to retrieve attendance data' });
+            }
+        });
+        
         // delete a user from database by id
         app.delete("/users/:id", async (req, res) => {
             try {

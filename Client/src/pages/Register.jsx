@@ -26,8 +26,13 @@ const Register = () => {
     };
 
     useEffect(() => {
-        getPrint();
-    }, [1000]);
+        const intervalId = setInterval(() => {
+            getPrint();
+        }, 1000);
+
+        // Clear interval on component unmount
+        return () => clearInterval(intervalId);
+    }, []);
 
 
     const handleCategoryChange = (e) => {
@@ -103,9 +108,11 @@ const Register = () => {
 
 
     return (
-        <div className=" mx-auto flex justify-center pt-10 h-screen bg-gray-100">
-            <div className="md:w-2/6 bg-white rounded-lg shadow-lg p-6 bg-opacity-20">
-                <img src={logo} alt="logo" className="w-30 h-20 mb-10" />
+        <div className=" mx-auto flex justify-center pt-10 h-screen">
+            <div className="md:w-2/6  bg-gray-100 rounded-lg shadow-xl p-6 bg-opacity-20">
+                <div className="flex justify-center">
+                    <img src={logo} alt="logo" className="w-40 h-30 mb-10" />
+                </div>
 
                 <h3 className="text-2xl font-semibold mb-4">Please Register</h3>
                 <form className="mx-auto form-control" onSubmit={handleSubmit(onSubmit)}>
@@ -189,7 +196,7 @@ const Register = () => {
 
                 </form>
 
-                <Link className="text-red-400" to="/">Go Back to home</Link>
+                <Link className="text-red-400 mt-10" to="/">Go Back to home</Link>
             </div>
         </div>
     );

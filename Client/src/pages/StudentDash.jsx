@@ -8,7 +8,7 @@ const StudentDash = () => {
     const [studentData, setStudentData] = useState([]);
 
     useEffect(() => {
-        fetch(`http://localhost:5000/student-att-data/${userID}`)
+        fetch(`https://attserver.vercel.app/student-att-data/${userID}`)
             .then(response => response.json())
             .then(data => {
                 if (Array.isArray(data)) {

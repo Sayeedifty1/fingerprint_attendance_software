@@ -13,7 +13,7 @@ const TeacherDash = () => {
     useEffect(() => {
         const fetchAttendanceData = async () => {
             try {
-                const response = await fetch(`http://localhost:5000/attendance/${courseName}`);
+                const response = await fetch(`https://attserver.vercel.app/attendance/${courseName}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch attendance data');
                 }
@@ -27,7 +27,7 @@ const TeacherDash = () => {
 
         const fetchStudentsData = async () => {
             try {
-                const response = await fetch('http://localhost:5000/users');
+                const response = await fetch('https://attserver.vercel.app/users');
                 if (!response.ok) {
                     throw new Error('Failed to fetch student data');
                 }
@@ -68,7 +68,7 @@ const TeacherDash = () => {
         console.log(attendanceInfo)
 
         try {
-            const response = await fetch('http://localhost:5000/student-att-data', {
+            const response = await fetch('https://attserver.vercel.app/student-att-data', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

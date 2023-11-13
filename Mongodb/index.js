@@ -72,23 +72,26 @@ async function run() {
         // Get the next serial number from the userCollection
         app.get('/next-serial', async (req, res) => {
             try {
-                const result = await usersCollection.find({}, { projection: { fingerprint: 1 }, sort: { fingerprint: 1 } }).toArray();
-
+                const result = await usersCollection.find({}, { projection: { fingerprint: 1 } }).toArray();
+        
                 if (result.length === 0) {
                     // If no data exists, start with serial number 1
                     res.json({ nextSerial: 1 });
                 } else {
+                    // Filter out non-numeric fingerprints, then sort in ascending order
+                    const sortedFingerprints = result
+                        .map(user => parseInt(user.fingerprint, 10))
+                        .filter(fingerprint => !isNaN(fingerprint))
+                        .sort((a, b) => a - b);
+        
                     // Find the first available serial number
                     let nextSerial = 1;
-                    for (const user of result) {
-                        const serial = parseInt(user.fingerprint, 10);
-                        if (!isNaN(serial) && serial === nextSerial) {
+                    for (const fingerprint of sortedFingerprints) {
+                        if (fingerprint === nextSerial) {
                             nextSerial++;
-                        } else {
-                            break; // Stop when a gap is found
                         }
                     }
-
+        
                     res.json({ nextSerial });
                 }
             } catch (error) {

@@ -8,6 +8,7 @@ import Login from "../pages/Login";
 import Register from "../pages/Register";
 import TeacherDash from "../pages/TeacherDash";
 import UserDetails from "../pages/UserDetails";
+import StudentDash from "../pages/StudentDash";
 
 const router = createBrowserRouter([
     {
@@ -33,6 +34,10 @@ const router = createBrowserRouter([
           {
             path:'/teacher-dashboard',
             element:<TeacherDash/>
+          },
+          {
+            path:'/std-dashboard',
+            element:<StudentDash/>
           }
       ]
     },

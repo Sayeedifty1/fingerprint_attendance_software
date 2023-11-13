@@ -73,7 +73,7 @@ async function run() {
         app.get('/next-serial', async (req, res) => {
             try {
                 const result = await usersCollection.find({}, { projection: { fingerprint: 1 } }).toArray();
-        
+
                 if (result.length === 0) {
                     // If no data exists, start with serial number 1
                     res.json({ nextSerial: 1 });
@@ -83,7 +83,7 @@ async function run() {
                         .map(user => parseInt(user.fingerprint, 10))
                         .filter(fingerprint => !isNaN(fingerprint))
                         .sort((a, b) => a - b);
-        
+
                     // Find the first available serial number
                     let nextSerial = 1;
                     for (const fingerprint of sortedFingerprints) {
@@ -91,7 +91,7 @@ async function run() {
                             nextSerial++;
                         }
                     }
-        
+
                     res.json({ nextSerial });
                 }
             } catch (error) {
@@ -183,6 +183,27 @@ async function run() {
                 res.status(500).json({ error: 'Failed to post student attendance data' });
             }
         });
+
+        
+
+        // get student attendance data from studentInfoCollection by id
+        app.get('/student-att-data/:id', async (req, res) => {
+            const studentId = req.params.id;
+
+            try {
+                const studentData = await studentInfoCollection.find({ id: studentId }).toArray();
+
+                if (studentData.length === 0) {
+                    res.status(404).json({ message: 'No student data found for this ID' });
+                } else {
+                    res.json(studentData);
+                }
+            } catch (err) {
+                console.error('Error fetching student data from MongoDB:', err);
+                res.status(500).json({ error: 'Failed to fetch student data' });
+            }
+        });
+
         // get all attendance data from attCollection
         app.get('/attendance/:course', async (req, res) => {
             const courseName = req.params.course;

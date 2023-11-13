@@ -48,7 +48,45 @@ const TeacherDash = () => {
         }
     }, [courseName]);
 
-    // ...
+    // send data to student panel
+    const handleSubmit = async () => {
+        const attendanceInfo = studentsData.map(student => {
+            const dates = Array.from(new Set(attendanceData.matchedData.filter(data => data.course === courseName).map(data => data.Date)));
+            const presentDays = dates.filter(date => attendanceData.matchedData.find(data => data.Date === date && Object.values(data).includes(student.fingerprint))).length;
+            const percentage = (presentDays / dates.length) * 100;
+
+            return {
+                courseName,
+                name: student.name,
+                id: student.id,
+                totalClasses: dates.length,
+                totalPresentDays: presentDays,
+                percentage: percentage.toFixed(1),
+                totalMarks: percentage / 10
+            };
+        });
+        console.log(attendanceInfo)
+
+        try {
+            const response = await fetch('http://localhost:5000/student-att-data', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(attendanceInfo)
+            });
+
+            if (!response.ok) {
+                alert('Failed to submit attendance data')
+                throw new Error('Failed to send attendance data');
+            }
+            alert('Attendance data submitted successfully')
+            const data = await response.json();
+            console.log(data);
+        } catch (error) {
+            console.error('Error sending attendance data:', error);
+        }
+    };
 
     return (
         <div className="w-[80%] mx-auto overflow-x-auto">
@@ -114,8 +152,7 @@ const TeacherDash = () => {
                             })}
                         </tbody>
                     </table>
-                        <button className="mt-8 p-1 bg-green-700 rounded-lg text-white">Submit</button>
-                    </>
+                    <button className="mt-8 p-1 bg-green-700 rounded-lg text-white" onClick={handleSubmit}>Submit</button>                    </>
                 ))
             )}
         </div>

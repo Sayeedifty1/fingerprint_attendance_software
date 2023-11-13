@@ -69,7 +69,7 @@ const Login = () => {
           )}
 
           <input
-            className="p-2 bg-blue-600 text-white rounded-lg mt-4"
+            className="p-2 bg-blue-600 text-white rounded-lg mt-4 cursor-pointer"
             value="Log In"
             type="submit"
           />

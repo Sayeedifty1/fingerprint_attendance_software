@@ -40,6 +40,7 @@ async function run() {
         const usersCollection = client.db("premier").collection("Users");
         const newPrintCollection = client.db("premier").collection("newReg");
         const attCollection = client.db("premier").collection("attendance");
+        const studentInfoCollection = client.db("premier").collection("studentInfo");
 
         // post string data in newPrintCollection only a string named newPrint
         app.post('/newReg', async (req, res) => {
@@ -95,7 +96,6 @@ async function run() {
                 res.status(500).json({ error: 'Failed to retrieve next serial' });
             }
         });
-
 
 
         // delete data from newReg collection
@@ -158,21 +158,43 @@ async function run() {
             }
         });
 
+        // Post student attendance data in studentInfoCollection
+        app.post('/student-att-data', async (req, res) => {
+            const studentAttendanceData = req.body;
+            const courseName = studentAttendanceData[0].courseName; // Assuming all objects in the array have the same course name
+
+            try {
+                // Delete all documents that match the course name
+                await studentInfoCollection.deleteMany({ courseName });
+
+                // Insert the new data
+                const result = await studentInfoCollection.insertMany(studentAttendanceData);
+
+                if (result.acknowledged) {
+                    res.status(201).json({ message: 'Student attendance data successfully posted' });
+                } else {
+                    throw new Error('Insert operation failed');
+                }
+            } catch (err) {
+                console.error('Error inserting student attendance data into MongoDB:', err);
+                res.status(500).json({ error: 'Failed to post student attendance data' });
+            }
+        });
         // get all attendance data from attCollection
         app.get('/attendance/:course', async (req, res) => {
             const courseName = req.params.course;
-        
+
             try {
                 // Search for attendance data based on the course name
                 const attendanceData = await attCollection.find({ course: courseName }).toArray();
-        
+
                 if (attendanceData.length === 0) {
                     return res.status(404).json({ error: 'Attendance data not found for the specified course' });
                 }
-        
+
                 // Extract unique course names
                 const uniqueCourses = [...new Set(attendanceData.map(data => data.course))];
-        
+
                 // Send the unique course names along with the matched attendance data
                 res.status(200).json({ matchedData: attendanceData, uniqueCourses });
             } catch (error) {
@@ -180,7 +202,7 @@ async function run() {
                 res.status(500).json({ error: 'Failed to retrieve attendance data' });
             }
         });
-        
+
         // delete a user from database by id
         app.delete("/users/:id", async (req, res) => {
             try {

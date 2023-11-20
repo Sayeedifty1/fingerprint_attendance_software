@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 const UserDetails = () => {
     const [users, setUsers] = useState([]);
     const [editUser, setEditUser] = useState(null); // Track the user being edited
-    const [editedUserData, setEditedUserData] = useState({ name: "", email: "", id: "" });
+    const [editedUserData, setEditedUserData] = useState({ name: "", email: "", id: "", courses: [], mobile: "" });
 
     useEffect(() => {
         // Fetch user data from your backend API or database when the component mounts
@@ -45,9 +45,10 @@ const UserDetails = () => {
     };
 
     const openEditModal = (user) => {
+        console.log(user)
         // Function to open the edit modal and populate it with user data
         setEditUser(user);
-        setEditedUserData({ name: user.name, email: user.email, id: user.id });
+        setEditedUserData({ name: user.name, email: user.email, id: user.id, courses: user.courses, mobile: user.mobile });
     };
 
     const closeEditModal = () => {
@@ -56,7 +57,6 @@ const UserDetails = () => {
     };
 
     const handleEditInputChange = (e) => {
-        // Function to handle input changes in the edit modal
         const { name, value } = e.target;
         setEditedUserData((prevData) => ({ ...prevData, [name]: value }));
     };
@@ -64,7 +64,7 @@ const UserDetails = () => {
     const updateUser = async () => {
         // Function to update user data
         try {
-            const response = await fetch(`https://attserver.vercel.app/users/${editUser._id}`, {
+            const response = await fetch(`http://localhost:5000/users/${editUser._id}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -73,6 +73,8 @@ const UserDetails = () => {
                     name: editedUserData.name,
                     email: editedUserData.email,
                     id: editedUserData.id,
+                    mobile: editedUserData.mobile,
+                    courses: editedUserData.courses.split(',').map(course => course.trim())
                 }),
             });
 
@@ -87,6 +89,7 @@ const UserDetails = () => {
             console.error("Error:", error);
         }
     };
+    // console.log(editUser.mobile)
 
     return (
         <div className="text-center">
@@ -141,7 +144,22 @@ const UserDetails = () => {
                         <input
                             type="text"
                             name="id"
+                            placeholder="Enter id"
                             value={editedUserData.id || ""}
+                            onChange={handleEditInputChange}
+                        />
+                        <input
+                            type="text"
+                            name="mobile"
+                            placeholder="Enter mobile"
+                            value={editUser.mobile || ""}
+                            onChange={handleEditInputChange}
+                        />
+                        <input
+                            type="text"
+                            name="courses"
+                            placeholder="Enter courses, separated by commas"
+                            value={editedUserData.courses || ""}
                             onChange={handleEditInputChange}
                         />
                         <button className="bg-green-600 p-1 rounded-lg text-white mt-6 mr-6" onClick={updateUser}>Update</button>

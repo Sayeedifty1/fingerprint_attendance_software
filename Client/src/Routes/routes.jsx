@@ -9,6 +9,7 @@ import Register from "../pages/Register";
 import TeacherDash from "../pages/TeacherDash";
 import UserDetails from "../pages/UserDetails";
 import StudentDash from "../pages/StudentDash";
+import AdminAtt from "../pages/AdminAtt";
 
 const router = createBrowserRouter([
     {
@@ -34,6 +35,10 @@ const router = createBrowserRouter([
           {
             path:'/teacher-dashboard',
             element:<TeacherDash/>
+          },
+          {
+            path:'/admin-attendance',
+            element:<AdminAtt/>
           },
           {
             path:'/std-dashboard',

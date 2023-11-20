@@ -29,6 +29,11 @@ const Navbar = () => {
                                 ) : (
                                     <Link to="/dashboard">Dashboard</Link>
                                 )}
+                                {
+                                    user?.category === "Admin" && (
+                                        <Link to="/admin-attendance" >Check Attendance</Link>
+                                    )
+                                }
                                 <Link onClick={signOut}>Logout</Link>
                             </li>
                         ) : (

@@ -143,7 +143,7 @@ async function run() {
             }
         });
 
-        // Post attencenceData in attCollection
+        // Post attendanceData in attCollection
         app.post('/attendance', async (req, res) => {
             const attendanceData = req.body;
             console.log(attendanceData);
@@ -247,10 +247,10 @@ async function run() {
         app.post("/users/:id", async (req, res) => {
             try {
                 const id = new ObjectId(req.params.id);
-                const { name, email, mobile } = req.body;
+                const { name, email, mobile, courses } = req.body;
                 const result = await usersCollection.updateOne(
                     { _id: id },
-                    { $set: { name, email, mobile } }
+                    { $set: { name, email, mobile,courses } }
                 );
 
                 if (result.modifiedCount > 0) {

@@ -64,7 +64,7 @@ const UserDetails = () => {
     const updateUser = async () => {
         // Function to update user data
         try {
-            const response = await fetch(`http://localhost:5000/users/${editUser._id}`, {
+            const response = await fetch(`https://attserver.vercel.app/users/${editUser._id}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -100,6 +100,8 @@ const UserDetails = () => {
                         <tr>
                             <th>Name</th>
                             <th>Email</th>
+                            <th>Phone Number</th>
+                            <th>Courses</th>
                             <th>Category</th>
                             <th>Action</th>
                         </tr>
@@ -109,6 +111,8 @@ const UserDetails = () => {
                             <tr key={user._id}>
                                 <td>{user.name}</td>
                                 <td>{user.email}</td>
+                                <td>{user.mobile}</td>
+                                <td>{user.courses?.join(', ')}</td>
                                 <td>{user.category}</td>
                                 <td className="flex text-center">
                                     <div>
@@ -155,13 +159,15 @@ const UserDetails = () => {
                             value={editUser.mobile || ""}
                             onChange={handleEditInputChange}
                         />
-                        <input
-                            type="text"
-                            name="courses"
-                            placeholder="Enter courses, separated by commas"
-                            value={editedUserData.courses || ""}
-                            onChange={handleEditInputChange}
-                        />
+                        {editUser.category !== "Student" && (
+                            <input
+                                type="text"
+                                name="courses"
+                                placeholder="Enter courses, separated by commas"
+                                value={editedUserData.courses || ""}
+                                onChange={handleEditInputChange}
+                            />
+                        )}
                         <button className="bg-green-600 p-1 rounded-lg text-white mt-6 mr-6" onClick={updateUser}>Update</button>
                         <button className="bg-red-600 p-1 rounded-lg text-white mt-6" onClick={closeEditModal}>Cancel</button>
                     </div>

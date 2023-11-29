@@ -163,31 +163,48 @@ async function run() {
 
         // Post student attendance data in studentInfoCollection
         app.post('/student-att-data', async (req, res) => {
-            const studentAttendanceData = req.body;
-            const courseName = studentAttendanceData[0].courseName; // Assuming all objects in the array have the same course name
-
             try {
-                // Delete all documents that match the course name
+                console.log('Received request body:', req.body);
+        
+                const studentAttendanceData = req.body;
+        
+                if (!Array.isArray(studentAttendanceData) || studentAttendanceData.length === 0) {
+                    return res.status(400).json({ error: 'Invalid or empty student attendance data provided' });
+                }
+        
+                const courseName = studentAttendanceData[0].courseName;
+        
+                // Input validation: Ensure each object has necessary properties
+                const isValidData = studentAttendanceData.every(item => (
+                    item.courseName === courseName && item.name && item.id && /* Add other required properties */
+                    typeof item.name === 'string' && typeof item.id === 'string' /* Add other type checks */
+                ));
+        
+                if (!isValidData) {
+                    return res.status(400).json({ error: 'Invalid student attendance data format' });
+                }
+        
+                // Delete existing data for the course
                 await studentInfoCollection.deleteMany({ courseName });
-
-                // Insert the new data
+        
+                // Insert new data
                 const result = await studentInfoCollection.insertMany(studentAttendanceData);
-
+        
                 if (result.acknowledged) {
                     res.status(201).json({ message: 'Student attendance data successfully posted' });
                 } else {
                     throw new Error('Insert operation failed');
                 }
             } catch (err) {
-                console.error('Error inserting student attendance data into MongoDB:', err);
-                res.status(500).json({ error: 'Failed to post student attendance data' });
+                console.error('Error handling student attendance data:', err);
+                res.status(500).json({ error: 'Failed to process student attendance data' });
             }
         });
-
+        
         
 
         // get student attendance data from studentInfoCollection by id
-        app.get('/student-att-data/:id', async (req, res) => {
+        app.get('/get-student-att-data/:id', async (req, res) => {
             const studentId = req.params.id;
 
             try {

@@ -5,7 +5,6 @@ const TeacherDash = () => {
     const { user } = useUser();
     const [courseName, setCourseName] = useState(user?.courses[0]);
     const teacherId = user?.fingerprint;
-    // const courseName = "VLSI"; // You can dynamically set this value based on your logic
     console.log(courseName)
     const [studentsData, setStudentsData] = useState([]);
     const [attendanceData, setAttendanceData] = useState({ matchedData: [], uniqueCourses: [] });
@@ -20,6 +19,7 @@ const TeacherDash = () => {
 
                 const data = await response.json();
                 setAttendanceData(data);
+                return data; // Return the data
             } catch (error) {
                 console.error('Error fetching attendance data:', error);
             }
@@ -33,62 +33,63 @@ const TeacherDash = () => {
                 }
 
                 const data = await response.json();
-                // Filter only students
                 const students = data.filter(student => student.category === 'Student');
                 setStudentsData(students);
+                return students; // Return the students
             } catch (error) {
                 console.error('Error fetching student data:', error);
             }
         };
-
+    
         if (teacherId) {
-            setAttendanceData({ matchedData: [], uniqueCourses: [] }); // Reset attendance data when course name changes
-            fetchAttendanceData();
-            fetchStudentsData();
-            handleSubmit();
+            setAttendanceData({ matchedData: [], uniqueCourses: [] });
+          fetchAttendanceData();
+           fetchStudentsData();
+            
+           
         }
-    }, [courseName]);
+    }, [courseName, teacherId]);
+   
+    const attendanceInfo = studentsData.map(student => {
+        const dates = Array.from(new Set(attendanceData.matchedData.filter(data => data.course === courseName).map(data => data.Date)));
+        const presentDays = dates.filter(date => attendanceData.matchedData.find(data => data.Date === date && Object.values(data).includes(student.fingerprint))).length;
+        console.log(presentDays)
+        const percentage = dates.length > 0 ? (presentDays / dates.length) * 100 : 0;
+        console.log(percentage)
+        return {
+            courseName,
+            name: student.name,
+            id: student.id,
+            totalClasses: dates.length,
+            totalPresentDays: presentDays,
+            percentage: percentage.toFixed(1),
+            totalMarks: percentage / 10
+        };
 
-    // send data to student panel
-    const handleSubmit = async () => {
-        const attendanceInfo = studentsData.map(student => {
-            const dates = Array.from(new Set(attendanceData.matchedData.filter(data => data.course === courseName).map(data => data.Date)));
-            const presentDays = dates.filter(date => attendanceData.matchedData.find(data => data.Date === date && Object.values(data).includes(student.fingerprint))).length;
-            const percentage = (presentDays / dates.length) * 100;
-
-            return {
-                courseName,
-                name: student.name,
-                id: student.id,
-                totalClasses: dates.length,
-                totalPresentDays: presentDays,
-                percentage: percentage.toFixed(1),
-                totalMarks: percentage / 10
-            };
-        });
-        console.log(attendanceInfo)
-
+    });
+    console.log(attendanceInfo)
+    const sendAttendanceDataToServer = async (attendanceInfo) => {
         try {
-            const response = await fetch('https://attserver.vercel.app/student-att-data', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(attendanceInfo)
-            });
-
-            if (!response.ok) {
-                alert('Failed to submit attendance data')
-                throw new Error('Failed to send attendance data');
-            }
-            // alert('Attendance data submitted successfully')
-            const data = await response.json();
-            console.log(data);
+          const response = await fetch('https://attserver.vercel.app/student-att-data', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(attendanceInfo),
+          });
+      
+          if (!response.ok) {
+            throw new Error('Failed to send attendance data to the server');
+          }
+      
+          const result = await response.json();
+          console.log(result); // Log the result from the server
         } catch (error) {
-            console.error('Error sending attendance data:', error);
+          console.error('Error sending attendance data to the server:', error);
         }
-    };
-
+      };
+      sendAttendanceDataToServer(attendanceInfo);
+   
     return (
         <div className="w-[80%] mx-auto overflow-x-auto">
             <h1 className="text-5xl my-10">Attendance </h1>

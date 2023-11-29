@@ -8,6 +8,7 @@ const AdminAtt = () => {
     const handleSelectChange = (event) => {
         setCourseName(event.target.value);
     };
+console.log(teacherDetails, courseName)
     // const teacherId = user?.fingerprint;
     // const courseName = "VLSI"; // You can dynamically set this value based on your logic
     console.log(courseName)
@@ -87,7 +88,7 @@ const AdminAtt = () => {
                 <select value={courseName} onChange={handleSelectChange}>
                     <option value="">Select a course</option>
                     <option value="MAE">MAE</option>
-                    <option value="CMS">CMSC</option>
+                    <option value="CMSC">CMSC</option>
                     <option value="DSP">DSP</option>
                     <option value="MM">MM</option>
 

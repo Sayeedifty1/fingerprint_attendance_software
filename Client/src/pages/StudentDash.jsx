@@ -4,11 +4,12 @@ import { useState, useEffect } from 'react';
 const StudentDash = () => {
     const { user } = useUser();
     const userID = user?.id;
+    console.log(userID)
 
     const [studentData, setStudentData] = useState([]);
 
     useEffect(() => {
-        fetch(`https://attserver.vercel.app/student-att-data/${userID}`)
+        fetch(`https://attserver.vercel.app/get-student-att-data/${userID}`)
             .then(response => response.json())
             .then(data => {
                 if (Array.isArray(data)) {

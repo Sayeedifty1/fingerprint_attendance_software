@@ -9,7 +9,7 @@ const StudentDash = () => {
     const [studentData, setStudentData] = useState([]);
 
     useEffect(() => {
-        fetch(`https://attserver.vercel.app/get-student-att-data/${userID}`)
+        fetch(`${import.meta.env.VITE_IP}/get-student-att-data/${userID}`)
             .then(response => response.json())
             .then(data => {
                 if (Array.isArray(data)) {

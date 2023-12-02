@@ -12,7 +12,7 @@ const TeacherDash = () => {
     useEffect(() => {
         const fetchAttendanceData = async () => {
             try {
-                const response = await fetch(`https://attserver.vercel.app/attendance/${courseName}`);
+                const response = await fetch(`${import.meta.env.VITE_IP}/attendance/${courseName}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch attendance data');
                 }
@@ -27,7 +27,7 @@ const TeacherDash = () => {
 
         const fetchStudentsData = async () => {
             try {
-                const response = await fetch('https://attserver.vercel.app/users');
+                const response = await fetch(`${import.meta.env.VITE_IP}/users`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch student data');
                 }
@@ -70,7 +70,7 @@ const TeacherDash = () => {
     console.log(attendanceInfo)
     const sendAttendanceDataToServer = async (attendanceInfo) => {
         try {
-          const response = await fetch('https://attserver.vercel.app/student-att-data', {
+          const response = await fetch(`${import.meta.env.VITE_IP}/student-att-data`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

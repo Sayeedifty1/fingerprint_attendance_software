@@ -4,6 +4,7 @@ const app = express();
 require('dotenv').config();
 
 const port = process.env.PORT || 5000;
+const ip = process.env.IP;
 
 // ! Middleware
 app.use(cors());
@@ -368,6 +369,6 @@ app.get('/', (req, res) => {
     res.send('Att. server is running')
 })
 
-app.listen(port, () => {
+app.listen(port, ip,() => {
     console.log(`server is running on port ${port}`)
 })

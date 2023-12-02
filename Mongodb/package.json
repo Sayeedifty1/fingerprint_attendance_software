@@ -18,5 +18,10 @@
     "jsonwebtoken": "^9.0.0",
     "mongodb": "^5.6.0",
     "stripe": "^12.9.0"
+  },
+  "engines": {
+    "node": "14.x",
+    "npm": "6.x"
   }
+  
 }

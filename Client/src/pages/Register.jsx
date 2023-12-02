@@ -13,7 +13,7 @@ const Register = () => {
     const [selectedCourses, setSelectedCourses] = useState([]); // Track selected courses
     const getPrint = async () => {
         try {
-            const response = await fetch("https://attserver.vercel.app/newReg");
+            const response = await fetch(`${import.meta.env.VITE_IP}/newReg`);
             if (response.ok) {
                 const data = await response.json();
                 setPrint(data[0].newPrint);
@@ -41,7 +41,7 @@ const Register = () => {
     // Function to delete the newPrint data
     const deletePrint = async () => {
         try {
-            const response = await fetch("https://attserver.vercel.app/newReg", {
+            const response = await fetch(`${import.meta.env.VITE_IP}/newReg`, {
                 method: "DELETE",
             });
 
@@ -86,7 +86,7 @@ const Register = () => {
                 reset(); // Reset the form
                 deletePrint(); // Delete the newPrint data
 
-                const response = await fetch("https://attserver.vercel.app/users", {
+                const response = await fetch(`${import.meta.env.VITE_IP}/users`, {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",

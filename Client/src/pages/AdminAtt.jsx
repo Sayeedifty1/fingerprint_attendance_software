@@ -18,7 +18,7 @@ console.log(teacherDetails, courseName)
     useEffect(() => {
         const fetchAttendanceData = async () => {
             try {
-                const response = await fetch(`https://attserver.vercel.app/attendance/${courseName}`);
+                const response = await fetch(`${import.meta.env.VITE_IP}/attendance/${courseName}`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch attendance data');
                 }
@@ -32,7 +32,7 @@ console.log(teacherDetails, courseName)
 
         const fetchStudentsData = async () => {
             try {
-                const response = await fetch('https://attserver.vercel.app/users');
+                const response = await fetch(`${import.meta.env.VITE_IP}/users`);
                 if (!response.ok) {
                     throw new Error('Failed to fetch student data');
                 }
@@ -54,7 +54,7 @@ console.log(teacherDetails, courseName)
     }, [courseName]);
 
     useEffect(() => {
-        fetch('https://attserver.vercel.app/users')
+        fetch(`${import.meta.env.VITE_IP}/users`)
             .then(response => response.json())
             .then(data => {
                 const teachers = data.filter(user => user.category === 'Teacher');

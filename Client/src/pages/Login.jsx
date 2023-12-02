@@ -15,7 +15,7 @@ const Login = () => {
 
   const onSubmit = async (formData) => {
     try {
-      const response = await fetch("https://attserver.vercel.app/authenticate", {
+      const response = await fetch(`${import.meta.env.VITE_IP}/authenticate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

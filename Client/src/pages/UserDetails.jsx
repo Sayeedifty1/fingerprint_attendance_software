@@ -13,7 +13,7 @@ const UserDetails = () => {
     console.log(editUser?._id)
     const fetchUserData = async () => {
         try {
-            const response = await fetch("https://attserver.vercel.app/users");
+            const response = await fetch(`${import.meta.env.VITE_IP}/users`);
             if (response.ok) {
                 const userData = await response.json();
                 setUsers(userData);
@@ -28,7 +28,7 @@ const UserDetails = () => {
     // delete a user by id
     const deleteUser = async (id) => {
         try {
-            const response = await fetch(`https://attserver.vercel.app/users/${id}`, {
+            const response = await fetch(`${import.meta.env.VITE_IP}/users/${id}`, {
                 method: "DELETE",
             });
             if (response.ok) {
@@ -64,7 +64,7 @@ const UserDetails = () => {
     const updateUser = async () => {
         // Function to update user data
         try {
-            const response = await fetch(`https://attserver.vercel.app/users/${editUser._id}`, {
+            const response = await fetch(`${import.meta.env.VITE_IP}/users/${editUser._id}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
